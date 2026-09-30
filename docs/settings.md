@@ -12,6 +12,24 @@ If at any time you wish to erase your customizations and start afresh, you can s
 
 ## General Settings
 
+<<<<<<< HEAD
+=======
+* `cite_auto_trigger` (`true`): if `true`, typing e.g. `\cite{` brings up the citation completion quick panel, without the need to type `C-l,x`. If `false`, you must explicitly type `C-l,x`.
+* `ref_auto_trigger` (`true`): ditto, but for `\ref{` and similar reference commands
+* `fill_auto_trigger` (`true`): ditto, but for package and file inclusion commands (see Fill Helper feature above)
+* `env_auto_trigger` (`true`): ditto, but for environment completions
+* `glossary_auto_trigger` (`true`): ditto, but for glossary completions
+* `tex_directive_auto_trigger` (`true`): ditto, but for tex directive completions
+* `cwl_autoload` (`true`): whether to load cwl completions based on packages (see the LaTeX-cwl feature)
+* `cwl_completion` (`prefixed`): when to activate the cwl completion poput (see LaTeX-cwl feature above)
+* `cwl_list` (`["latex-document.cwl", "tex.cwl", "latex-dev", "latex-209.cwl", "latex-l2tabu.cwl", "latex-mathsymbols.cwl"]`): list of cwl files to load
+* `keep_focus` (`true`): if `true`, after compiling a tex file, ST retains the focus; if `false`, the PDF viewer gets the focus. Also note that you can *temporarily* toggle this behavior with `C-l,t,f`.This can also be overridden via a key-binding by passing a `keep_focus` argument to `jump_to_pdf`.
+ **Note**: In general, `keep_focus` set to `true` tries to mean "do not *change* the focus". This isn't always possible, since several of the viewers will steal focus by default. In those circumstances, LaTeXTools tries to actively return the focus to Sublime. To disable this, set the `disable_focus_hack` setting to `true`.
+ **Note**: If you are on either Windows or Linux you may need to adjust the `sublime_executable` setting for this to work properly. See the [Platform settings](#platform-specific-settings) below.
+* `forward_sync` (`true`): if `true`, after compiling a tex file, the PDF viewer is asked to sync to the position corresponding to the current cursor location in ST. You can also *temporarily* toggle this behavior with `C-l,t,s`. This can also be overridden via a key-binding by passing a `forward_sync` argument to `jump_to_pdf`.
+* `tex_file_exts` (`['.tex']`): a list of extensions that should be considered TeX documents. Any extensions in this list will be treated exactly the same as `.tex` files. See the section on [Support for non-`.tex` files](#support-for-non-tex-files).
+* `latextools_set_syntax` (`true`): if `true` LaTeXTools will automatically set the syntax to `LaTeX` when opening or saving any file with an extension in the `tex_file_exts` list.
+>>>>>>> master
 * `overwrite_goto_overlay` (`true`): Set this to `false` to disable the overwriting of the goto overlay for the hotkey `C-r` and `C-shift-r` You can still access the "table of content quickpanel" via `C-l, C-r` and `C-shift-l, C-r
 * `enable_smart_paste` (`true`) if smart paste is enabled LaTeXTools will overwrite the C-v command and analyze the clipboard content to check whether it should execute an action. So you can just paste image urls or paths into Sublime Text and it will automatically download the image and create a figure environment.
 * `latextools_set_syntax` (`true`): if `true` LaTeXTools will automatically set the syntax to `LaTeX` when opening or saving any file with an extension in the `tex_file_exts` list.

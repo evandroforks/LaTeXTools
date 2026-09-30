@@ -2,10 +2,26 @@
 LaTeX Package keymap for OS X
 */
 [
+<<<<<<< HEAD
 	// Hide inline build error phantoms
 	{
 		"keys": ["escape"],
 		"command": "latextools_make_pdf", "args": { "hide_annotations_only": true },
+=======
+	{
+		"keys": ["tab"],
+		"command": "latextools_confirm_quickpanel",
+		"context":
+		[
+			{ "key": "overlay_visible" },
+			{ "key": "latextools.input_overlay_visible" },
+		],
+	},
+
+	// these also override ST3 commands, but we simply run the same commands
+	// it is necessary so on ST2 we can implement our build selector
+	{	"keys": ["super+b"],
+>>>>>>> master
 		"context": [
 			{ "key": "latextools_inline_errors_visible" }
 		]
@@ -601,6 +617,7 @@ LaTeX Package keymap for OS X
 	// Also add these overlays to `C-l, C-r` and `C-l, C-shift-r`
 	// ------------------------------------------------------------------
 
+<<<<<<< HEAD
 	{
 		"keys": ["super+r"],
 		"command": "latextools_toc_quickpanel", "args": { "only_current_file": true },
@@ -1325,6 +1342,21 @@ LaTeX Package keymap for OS X
 			{ "key": "setting.command_mode", "operand": false },
 			{ "key": "setting.auto_match_enabled" },
 			{ "key": "selection_empty", "match_all": true },
+=======
+		// Auto-pair ``$''
+		// Lifted from default file
+	// insert matching $
+	// note the "key": "selector" line!
+	{ "keys": ["$"], "command": "insert_snippet", "args": {"contents": "\\$$0\\$"},
+	"context":
+		[
+			{ "key": "setting.command_mode", "operator": "equal", "operand": false },
+			{ "key": "selector", "operator": "equal", "operand": "text.tex.latex" },
+			{ "key": "setting.auto_match_enabled", "operator": "equal", "operand": true },
+			{ "key": "selection_empty", "operator": "equal", "operand": true, "match_all": true },
+			// do not insert this if it is escaped
+			{ "key": "preceding_text", "operator": "not_regex_contains", "operand": "(?:\\\\\\\\)*(?:\\\\|\\$)$", "match_all": true },
+>>>>>>> master
 			// don't insert, it inside math environments
 			{ "key": "selector", "operand": "text.tex.latex - meta.environment.math - string.other.math", "match_all": true },
 			// do not insert this if it is escaped
@@ -1345,6 +1377,7 @@ LaTeX Package keymap for OS X
 			{ "key": "selector", "operand": "text.tex.latex" }
 		]
 	},
+<<<<<<< HEAD
 	{
 		"keys": ["$"],
 		"command": "move", "args": { "by": "characters", "forward": true},
@@ -1364,6 +1397,41 @@ LaTeX Package keymap for OS X
 			{ "key": "setting.auto_match_enabled" },
 			{ "key": "selection_empty", "match_all": true },
 			{ "key": "selector", "operand": "text.tex.latex" },
+=======
+	// wrap in $
+	{ "keys": ["$"], "command": "insert_snippet", "args": {"contents": "\\$"}, "context":
+		[
+			{ "key": "setting.command_mode", "operator": "equal", "operand": false },
+			{"key": "selector", "operator": "equal", "operand": "text.tex.latex"},
+			{ "key": "setting.auto_match_enabled", "operator": "equal", "operand": true },
+			{ "key": "selection_empty", "operator": "equal", "operand": false, "match_all": true }
+		]
+	},
+	{ "keys": ["$"], "command": "insert_snippet", "args": {"contents": "\\$${0:$SELECTION}\\$"}, "context":
+		[
+			{ "key": "setting.command_mode", "operator": "equal", "operand": false },
+			{"key": "selector", "operator": "equal", "operand": "text.tex.latex"},
+			{ "key": "setting.auto_match_enabled_selection", "operator": "equal", "operand": true },
+			{ "key": "selection_empty", "operator": "equal", "operand": false, "match_all": true }
+		]
+	},
+	// move over closing $
+	{ "keys": ["$"], "command": "move", "args": {"by": "characters", "forward": true}, "context":
+		[
+			{ "key": "setting.command_mode", "operator": "equal", "operand": false },
+			{"key": "selector", "operator": "equal", "operand": "text.tex.latex"},
+			{ "key": "setting.auto_match_enabled_move", "operator": "equal", "operand": true },
+			{ "key": "selection_empty", "operator": "equal", "operand": true, "match_all": true },
+			{ "key": "following_text", "operator": "regex_contains", "operand": "^\\$", "match_all": true }
+		]
+	},
+	// delete $ pair
+	{ "keys": ["backspace"], "command": "run_macro_file", "args": {"file": "Packages/Default/Delete Left Right.sublime-macro"}, "context":
+		[
+			{"key": "selector", "operator": "equal", "operand": "text.tex.latex"},
+			{ "key": "setting.auto_match_enabled_delete", "operator": "equal", "operand": true },
+			{ "key": "selection_empty", "operator": "equal", "operand": true, "match_all": true },
+>>>>>>> master
 			{ "key": "preceding_text", "operator": "regex_contains", "operand": "\\$$", "match_all": true },
 			{ "key": "following_text", "operator": "regex_contains", "operand": "^\\$", "match_all": true }
 		]
@@ -1400,6 +1468,7 @@ LaTeX Package keymap for OS X
 			{ "key": "preceding_text", "operator": "regex_contains", "operand": "\\\\(?:item|only|textbf|color|onslide|only|uncover|visible|invisible|alt|temporal)$", "match_all": true }
 		]
 	},
+<<<<<<< HEAD
 	{
 		"keys": ["<"],
 		"command": "insert_snippet", "args": { "contents": "<${0:$SELECTION}>" },
@@ -1429,6 +1498,37 @@ LaTeX Package keymap for OS X
 			{ "key": "setting.auto_match_enabled" },
 			{ "key": "selection_empty", "match_all": true },
 			{ "key": "selector", "operand": "text.tex.latex" },
+=======
+	// wrap in <>
+	{ "keys": ["<"], "command": "insert_snippet", "args": {"contents": "<"}, "context":
+		[
+			{"key": "selector", "operator": "equal", "operand": "text.tex.latex"},
+			{ "key": "setting.auto_match_enabled", "operator": "equal", "operand": true },
+			{ "key": "selection_empty", "operator": "equal", "operand": false, "match_all": true }
+		]
+	},
+	{ "keys": ["<"], "command": "insert_snippet", "args": {"contents": "<${0:$SELECTION}>"}, "context":
+		[
+			{"key": "selector", "operator": "equal", "operand": "text.tex.latex"},
+			{ "key": "setting.auto_match_enabled_selection", "operator": "equal", "operand": true },
+			{ "key": "selection_empty", "operator": "equal", "operand": false, "match_all": true }
+		]
+	},
+	// move over closing >
+	{ "keys": [">"], "command": "move", "args": {"by": "characters", "forward": true}, "context":
+		[
+			{"key": "selector", "operator": "equal", "operand": "text.tex.latex"},
+			{ "key": "setting.auto_match_enabled_move", "operator": "equal", "operand": true },
+			{ "key": "selection_empty", "operator": "equal", "operand": true, "match_all": true },
+			{ "key": "following_text", "operator": "regex_contains", "operand": "^>", "match_all": true }
+		]
+	},
+	// delete <> pair
+	{ "keys": ["backspace"], "command": "run_macro_file", "args": {"file": "Packages/Default/Delete Left Right.sublime-macro"}, "context":
+		[
+			{"key": "selector", "operator": "equal", "operand": "text.tex.latex"},
+			{ "key": "setting.auto_match_enabled_delete", "operator": "equal", "operand": true },
+>>>>>>> master
 			{ "key": "preceding_text", "operator": "regex_contains", "operand": "<$", "match_all": true },
 			{ "key": "following_text", "operator": "regex_contains", "operand": "^>", "match_all": true }
 		]
@@ -1449,6 +1549,7 @@ LaTeX Package keymap for OS X
 			{ "key": "preceding_text", "operator": "not_regex_contains", "operand": "\"$", "match_all": true }
 		]
 	},
+<<<<<<< HEAD
 	{
 		"keys": ["`"],
 		"command": "insert_snippet", "args": { "contents": "`${0:$SELECTION}'" },
@@ -1478,6 +1579,35 @@ LaTeX Package keymap for OS X
 			{ "key": "setting.auto_match_enabled" },
 			{ "key": "selection_empty", "match_all": true },
 			{ "key": "selector", "operand": "text.tex.latex" },
+=======
+	{ "keys": ["`"], "command": "insert_snippet", "args": {"contents": "`"}, "context":
+		[
+			{ "key": "selector", "operator": "equal", "operand": "text.tex.latex"},
+			{ "key": "setting.auto_match_enabled", "operator": "equal", "operand": true },
+			{ "key": "selection_empty", "operator": "equal", "operand": false, "match_all": true }
+		]
+	},
+	{ "keys": ["`"], "command": "insert_snippet", "args": {"contents": "`${0:$SELECTION}'"}, "context":
+		[
+			{ "key": "selector", "operator": "equal", "operand": "text.tex.latex"},
+			{ "key": "setting.auto_match_enabled_selection", "operator": "equal", "operand": true },
+			{ "key": "selection_empty", "operator": "equal", "operand": false, "match_all": true }
+		]
+	},
+	{ "keys": ["'"], "command": "move", "args": {"by": "characters", "forward": true}, "context":
+		[
+			{ "key": "selector", "operator": "equal", "operand": "text.tex.latex"},
+			{ "key": "setting.auto_match_enabled_move", "operator": "equal", "operand": true },
+			{ "key": "selection_empty", "operator": "equal", "operand": true, "match_all": true },
+			{ "key": "following_text", "operator": "regex_contains", "operand": "^'", "match_all": true }
+		]
+	},
+	{ "keys": ["backspace"], "command": "run_macro_file", "args": {"file": "Packages/Default/Delete Left Right.sublime-macro"}, "context":
+		[
+			{ "key": "selector", "operator": "equal", "operand": "text.tex.latex"},
+			{ "key": "setting.auto_match_enabled_delete", "operator": "equal", "operand": true },
+			{ "key": "selection_empty", "operator": "equal", "operand": true, "match_all": true },
+>>>>>>> master
 			{ "key": "preceding_text", "operator": "regex_contains", "operand": "`$", "match_all": true },
 			{ "key": "following_text", "operator": "regex_contains", "operand": "^'", "match_all": true }
 		]
