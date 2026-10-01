@@ -8,15 +8,9 @@
 // Again: there is NOTHING user-customizable here anymore.
 
 {
-<<<<<<< HEAD:Compile to PDF.sublime-build
 	"target": "latextools_make_pdf",
 	"cancel": {"kill": true},
-	"selector": "text.tex.latex",
-=======
-
-	"target": "make_pdf",
-	"selector": "text.tex, text.biblatex",
->>>>>>> master:LaTeX.sublime-build
+	"selector": "text.tex.latex, text.biblatex",
 
 	// patterns:
 	// 1. \\UNC\path\file.ext

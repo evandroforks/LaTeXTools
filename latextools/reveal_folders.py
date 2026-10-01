@@ -57,7 +57,7 @@ class LatextoolsRevealOutputDirectoryCommand(sublime_plugin.WindowCommand):
         view = self.window.active_view()
         return (
             view
-            and view.match_selector(0, "text.tex.latex")
+            and view.match_selector(0, "text")
             and bool(get_setting("output_directory", False, view))
         )
 

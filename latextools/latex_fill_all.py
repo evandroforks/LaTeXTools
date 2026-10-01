@@ -909,64 +909,33 @@ class LatextoolsFillAllCommand(
         insert an entry; if force is true, completion_type must be a string;
         if force is true, the bracket matching and word overwriting behaviour
         is disabled
-<<<<<<< HEAD:latextools/latex_fill_all.py
-    """
-=======
-
     :param single_selection:
-        positive integer indicating to ignore multiple cursors/carets on the
-        text and use one specific selection point. This is useful when creating
-        a snippet which defaults to creating multiple carets/cursors and want to
-        force the completion for some specific scope as `input` or `cite`.
-        Therefore we must to ignore the multi selection, otherwise it will
-        ignore the input scope specified
-        the accepted values start on 1 for the first selection, 2 for the second
-        and etc. They must to be lower then the maximum selections + 1, otherwise
-        this setting will be ignored.
-    '''
->>>>>>> master:latex_fill_all.py
+        one-based index of the selection to use for completion context. If the
+        index is invalid, all selections are checked as usual.
+    """
 
     def is_visible(self, *args):
         return self.view.match_selector(0, "text.tex.latex")
 
-<<<<<<< HEAD:latextools/latex_fill_all.py
-    def run(self, edit, completion_type=None, insert_char="", overwrite=False, force=False):
-=======
     def run(
-        self, edit, completion_type=None, insert_char="", overwrite=False,
-        force=False, single_selection=None
+        self, edit, completion_type=None, insert_char="", overwrite=False, force=False,
+        single_selection=None,
     ):
->>>>>>> master:latex_fill_all.py
         view = self.view
         selections = view.sel()
-        selections_len = len(selections)
 
-<<<<<<< HEAD:latextools/latex_fill_all.py
-        for sel in view.sel():
-            point = sel.b
+        if not selections:
+            return
+
+        if single_selection is not None and 1 <= single_selection <= len(selections):
+            points = (selections[single_selection - 1].b,)
+        else:
+            points = (sel.b for sel in selections)
+
+        for point in points:
             if not view.match_selector(point, "text.tex.latex"):
                 self.complete_brackets(view, edit, insert_char)
                 return
-=======
-        # No selections? What?
-        if not selections_len:
-            return
-
-        # initialize the `point` variable to a proper value, to be used later
-        if single_selection:
-            single_selection -= 1
-            if single_selection > -1 and single_selection < selections_len:
-                point = selections[single_selection].b
-                if not view.score_selector(point, "text.tex.latex"):
-                    self.complete_brackets(view, edit, insert_char)
-                    return
-        else:
-            for sel in selections:
-                point = sel.b
-                if not view.score_selector(point, "text.tex.latex"):
-                    self.complete_brackets(view, edit, insert_char)
-                    return
->>>>>>> master:latex_fill_all.py
 
         # if completion_type is a simple string, try to load it
         if isinstance(completion_type, str):

@@ -49,6 +49,9 @@ SUPPORTED_PDF_COMPILERS = ("pdflatex", "pdftex", "xelatex", "xetex", "lualatex",
 
 
 class CmdThread(threading.Thread):
+    last_elapsed_seconds = 0.0
+    elapsed_lock = threading.Lock()
+
     # Use __init__ to pass things we need
     # in particular, we pass the caller in teh main thread, so we can display stuff!
     def __init__(self, caller):
@@ -62,9 +65,16 @@ class CmdThread(threading.Thread):
     def worker(self, activity_indicator):
         t1 = time.monotonic()
 
+        with self.elapsed_lock:
+            previous_elapsed = int(self.last_elapsed_seconds)
+        hours, remainder = divmod(previous_elapsed, 3600)
+        minutes, seconds = divmod(remainder, 60)
+        timestamp = time.strftime("%Y-%m-%d, %H:%M:%S", time.localtime())
+
         logger.debug(f"Welcome to thread {self.name}")
         self.caller.output(
-            f"[Compiling '{self.caller.builder.tex_root}' with '{self.caller.builder.name}']\n"
+            f"[Compiling '{self.caller.builder.tex_root}' with '{self.caller.builder.name}'] "
+            f"{timestamp} ({hours:02d}:{minutes:02d}:{seconds:02d} seconds)\n"
         )
 
         # Now, iteratively call the builder iterator
@@ -246,7 +256,7 @@ class CmdThread(threading.Thread):
                         content[-1] = content[-1] + " No bad boxes."
 
             content.append("")
-            content.append(log_file + ":1: Double-click here to open the full log.")
+            content.append(log_file + ":1000000: Double-click here to open the full log.")
 
             show_panel = {
                 "always": True,
@@ -283,10 +293,13 @@ class CmdThread(threading.Thread):
             activity_indicator.finish(message)
 
             self.caller.output(content)
+            elapsed_seconds = time.monotonic() - t1
+            with self.elapsed_lock:
+                type(self).last_elapsed_seconds = elapsed_seconds
             if aborted:
                 self.caller.output("\n\n[Build failed!]")
             else:
-                elapsed = time.monotonic() - t1
+                elapsed = elapsed_seconds
                 if elapsed >= 60:
                     elapsed = time.strftime("%M:%S", time.gmtime(elapsed))
                 else:
@@ -419,7 +432,7 @@ class LatextoolsMakePdfCommand(sublime_plugin.WindowCommand):
                 "Packages/LaTeXTools/LaTeXTools Build Output.sublime-syntax"
             )
 
-        self.output_view.set_read_only(True)
+        self.output_view.set_read_only(False)
 
         self.show_panel_level = get_setting("show_panel_on_build", "badboxes", view)
         if self.show_panel_level == "always":

@@ -45,7 +45,7 @@
 	},
 	{
 		"caption": "LaTeXTools: Show toggles",
-		"command": "toggle_show"
+		"command": "latextools_toggle_keys"
 	},
 	{
 		"caption": "LaTeXTools: Search for commands in document",
@@ -79,6 +79,17 @@
 	{
 		"caption": "LaTeXTools: Paste Image from Clipboard",
 		"command": "latextools_smart_paste"
+	},
+	// Requires the ChainOfCommand package.
+	{
+		"caption": "LaTeXTools: Insert Image",
+		"command": "chain",
+		"args": {
+			"commands": [
+				["insert_snippet", {"contents": "\\begin{figure}[H]\n\\centering\n\\includegraphics[width=1.0\\textwidth]{$TM_SELECTED_TEXT$1}\n\\caption{$1}\n\\label{fig:$1}\n\\end{figure}"}],
+				["latextools_fill_all", {"completion_type": "input", "force": true, "single_selection": 1}]
+			]
+		}
 	},
 	{
 		"caption": "LaTeXTools: Clear inline build error messages",

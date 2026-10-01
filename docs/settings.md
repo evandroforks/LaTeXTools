@@ -12,24 +12,6 @@ If at any time you wish to erase your customizations and start afresh, you can s
 
 ## General Settings
 
-<<<<<<< HEAD
-=======
-* `cite_auto_trigger` (`true`): if `true`, typing e.g. `\cite{` brings up the citation completion quick panel, without the need to type `C-l,x`. If `false`, you must explicitly type `C-l,x`.
-* `ref_auto_trigger` (`true`): ditto, but for `\ref{` and similar reference commands
-* `fill_auto_trigger` (`true`): ditto, but for package and file inclusion commands (see Fill Helper feature above)
-* `env_auto_trigger` (`true`): ditto, but for environment completions
-* `glossary_auto_trigger` (`true`): ditto, but for glossary completions
-* `tex_directive_auto_trigger` (`true`): ditto, but for tex directive completions
-* `cwl_autoload` (`true`): whether to load cwl completions based on packages (see the LaTeX-cwl feature)
-* `cwl_completion` (`prefixed`): when to activate the cwl completion poput (see LaTeX-cwl feature above)
-* `cwl_list` (`["latex-document.cwl", "tex.cwl", "latex-dev", "latex-209.cwl", "latex-l2tabu.cwl", "latex-mathsymbols.cwl"]`): list of cwl files to load
-* `keep_focus` (`true`): if `true`, after compiling a tex file, ST retains the focus; if `false`, the PDF viewer gets the focus. Also note that you can *temporarily* toggle this behavior with `C-l,t,f`.This can also be overridden via a key-binding by passing a `keep_focus` argument to `jump_to_pdf`.
- **Note**: In general, `keep_focus` set to `true` tries to mean "do not *change* the focus". This isn't always possible, since several of the viewers will steal focus by default. In those circumstances, LaTeXTools tries to actively return the focus to Sublime. To disable this, set the `disable_focus_hack` setting to `true`.
- **Note**: If you are on either Windows or Linux you may need to adjust the `sublime_executable` setting for this to work properly. See the [Platform settings](#platform-specific-settings) below.
-* `forward_sync` (`true`): if `true`, after compiling a tex file, the PDF viewer is asked to sync to the position corresponding to the current cursor location in ST. You can also *temporarily* toggle this behavior with `C-l,t,s`. This can also be overridden via a key-binding by passing a `forward_sync` argument to `jump_to_pdf`.
-* `tex_file_exts` (`['.tex']`): a list of extensions that should be considered TeX documents. Any extensions in this list will be treated exactly the same as `.tex` files. See the section on [Support for non-`.tex` files](#support-for-non-tex-files).
-* `latextools_set_syntax` (`true`): if `true` LaTeXTools will automatically set the syntax to `LaTeX` when opening or saving any file with an extension in the `tex_file_exts` list.
->>>>>>> master
 * `overwrite_goto_overlay` (`true`): Set this to `false` to disable the overwriting of the goto overlay for the hotkey `C-r` and `C-shift-r` You can still access the "table of content quickpanel" via `C-l, C-r` and `C-shift-l, C-r
 * `enable_smart_paste` (`true`) if smart paste is enabled LaTeXTools will overwrite the C-v command and analyze the clipboard content to check whether it should execute an action. So you can just paste image urls or paths into Sublime Text and it will automatically download the image and create a figure environment.
 * `latextools_set_syntax` (`true`): if `true` LaTeXTools will automatically set the syntax to `LaTeX` when opening or saving any file with an extension in the `tex_file_exts` list.
@@ -42,12 +24,12 @@ If at any time you wish to erase your customizations and start afresh, you can s
 
 ## Completion Settings
 
-* `command_completion` (`prefixed`): when to activate the cwl completion poput (see CWL feature above)
+* `command_completion` (`never`): when to activate the CWL command completion popup (see the CWL feature above)
 * `cwl_autoload` (`true`): whether to load cwl completions based on packages (see the CWL feature)
 * `cwl_list` (`["latex-document.cwl", "tex.cwl", "latex-dev", "latex-209.cwl", "latex-l2tabu.cwl", "latex-mathsymbols.cwl"]`): list of cwl files to load
-* `cite_auto_trigger` (`true`): if `true`, typing e.g. `\cite{` brings up the citation completion quick panel, without the need to type `C-l,x`. If `false`, you must explicitly type `C-l,x`.
+* `cite_auto_trigger` (`false`): if `true`, typing e.g. `\cite{` brings up the citation completion quick panel, without the need to type `C-l,x`. If `false`, you must explicitly type `C-l,x`.
 * `ref_auto_trigger` (`true`): ditto, but for `\ref{` and similar reference commands
-* `env_auto_trigger` (`true`): ditto, but for environment completions
+* `env_auto_trigger` (`false`): ditto, but for environment completions
 * `fill_auto_trigger` (`true`): ditto, but for package and file inclusion commands (see Fill Helper feature above)
 * `glossary_auto_trigger` (`true`): ditto, but for glossary completions
 * `tex_directive_auto_trigger` (`true`): ditto, but for tex directive completions
@@ -67,8 +49,9 @@ or a color name (e.g. `"yellow"`) If it is the empty string `""` it will be gues
 * `preview_math_background_color` (`""`): The background color of the preview math phantoms. In contrast to the foreground color you may also edit your colorscheme to change this. The format can either be RGB(A) based `"#RRGGBB"` (e.g. `"#0000FF"` or `"#0000FF50"`) or a color name (e.g. `"blue"`). If it is the empty string `""` the default color will be used.
 * `preview_math_template_packages`: An array containing the used packages for the template as latex code.
 * `preview_math_template_preamble` (`""`): An string of the remaining preamble (not packages) for the file, which generates the math live preview. Can also be an array, with an string for each line (as in the packages). This is useful, if you define math commands or operators on your own. You may change this per project basis.
-* `preview_math_density` (`300`): The density of the preview image. The higher the density the larger the phantom.
-* `preview_math_scale_quotient` (`2`): If the image is not sharp enough increase this scale to get a better resolution. However also change the density by the same factor to keep the size.
+* `preview_math_density` (`150`): The density of the preview image. The higher the density the larger the phantom.
+* `preview_math_scale_quotient` (`1`): If the image is not sharp enough increase this scale to get a better resolution. However also change the density by the same factor to keep the size.
+* `preview_math_hires` (`true`): Render at a higher resolution before scaling the preview down.
 
 #### Preview Image Settings
 
@@ -93,13 +76,13 @@ This section refers to setting that can be found in a platform-specific block fo
 
 ### All Platforms
 
-  * `texpath` (varies): path-list, starting with path to TeX & friends, being used to lookup LaTeX commands. It replaces global `$PATH` environment variable and thus must be of the form `"/path/to/tex:$PATH` (Linux/MacOS) or `"C:\\path\\to\\tex;$PATH"` (Windows) to ensure custom TeX paths take precedence over already defined global ones.
+  * `texpath` (varies): path list used to find TeX commands. The fork's Linux and macOS defaults place the existing `$PATH` first; place a custom TeX path before `$PATH` when it must take precedence.
   * `sublime_executable` (`""`): absolute path to `sublime_text.exe` to construct subl command line calls, if the path to sublime_text executable cannot be discovered automatically.
   * `keep_focus_delay` (`0.5`): this is used if `keep_focus` is set to true. It controls how long (in seconds) the delay is between the completion of the `latextools_jumpto_pdf` command and the attempt to refocus on Sublime Text. This may need to be adjusted depending on your machine or configuration.
 
 ### Windows
 
-  * `distro` (`miktex`): either `miktex` or `texlive`, depending on your TeX distribution
+  * `distro` (`texlive`): either `miktex` or `texlive`, depending on your TeX distribution
   * `sumatra` (`""`): leave blank or omit if the SumatraPDF executable is in your `PATH` and is called `SumatraPDF.exe`, as in a default installation; otherwise, specify the *full path and file name* of the SumatraPDF executable.
 
 ### Linux
@@ -109,11 +92,11 @@ This section refers to setting that can be found in a platform-specific block fo
 
 ## Output Directory Settings
 
-* `aux_directory` (`""`): specifies the auxiliary directory to store any auxiliary files generated during a LaTeX build. Path can be specified absolute or relative to `tex_root` or, if `aux_directory` set in a project file, relative to project file's location. In addition, the following special values are honored:
+* `aux_directory` (`"<<cache>>"`): specifies the auxiliary directory to store any auxiliary files generated during a LaTeX build. Path can be specified absolute or relative to `tex_root` or, if `aux_directory` set in a project file, relative to project file's location. In addition, the following special values are honored:
   * `<<temp>>`: uses a temporary directory in the system temp directory instead of a specified path; this directory will be unique to each main file, but does not persist across restarts.
   * `<<cache>>`: uses the ST cache directory (or a suitable directory on ST2) to store the output files; unlike the `<<temp>>` option, this directory can persist across restarts.
   * `<<project>>`: uses a sub-directory in the same folder as the main tex file with what should be a unique name; note, this is probably not all that useful and you're better off using one of the other two options or a named relative path
-* `output_directory` (`""`): specifies the output directory to store any file generated during a LaTeX build. Path can be specified using either an absolute path or a relative path. If `output_directory` is set from the project file, a relative path will be interpreted as relative to the project file. If it is set in the settings file, it will be interpreted relative to the main tex file. In addition, output_directory honors the same special values as `aux_directory`.
+* `output_directory` (`"<<cache>>"`): specifies the output directory to store any file generated during a LaTeX build. Path can be specified using either an absolute path or a relative path. If `output_directory` is set from the project file, a relative path will be interpreted as relative to the project file. If it is set in the settings file, it will be interpreted relative to the main tex file. In addition, output_directory honors the same special values as `aux_directory`.
 * `jobname` (`""`): specifies the jobname to use for the build, corresponding to the pdflatex `--jobname` argument.
 
 ## Builder Settings
@@ -126,7 +109,7 @@ This section refers to setting that can be found in a platform-specific block fo
 	* `"script"`: invokes the set of commands specified in the `"script_commands"` setting in the platform-specific part of the `"builder_settings"`. See [the documentation](buildsystem.md#script-builder) for details.
 	* `"simple"`: invokes `pdflatex` 1x or 2x as needed, then `bibtex` and `pdflatex` again if needed; intended mainly as a simple example for people writing their own build engines.
 	* Other values can be used to indicate the use of a custom build system. Note that custom builder **cannot** have the same name as a built-in engine. For an overview of how to write a custom builder, see the [custom builder section](buildsystem.md#custom-builder)
-* `builder-settings`: this contains builder-specific settings.
+* `builder_settings`: this contains builder-specific settings.
 	* `display_log` (`false`): if `true` the output of each command will be displayed in the output panel. This can be useful for troubleshooting issues with the build system and is supported by all built-in build systems.
 	*`env` (unset): a dictionary of key-values corresponding to environment variables that should be set for the environment the build is run in. Note that `env`, if it is set, must be set at the platform-specific level, e.g., under the `osx`, `windows`, or `linux` keys. This is useful for setting, e.g., `TEXINPUTS`.
 	For the `default`/`traditional` builder, the following settings are useful:
@@ -134,7 +117,7 @@ This section refers to setting that can be found in a platform-specific block fo
 		* `command` (unset): command to execute. Can be compiler name to use or a list of strings specifying precise command line to be invoked. If `latexmk` or `texify` string is specified, related default command line is invoked. If unset, default compiler is choosen based on distro and availability. The defaults (hardcoded, not shown in the settings file) are:
 			* (TeXLive): `["latexmk", "-cd", "-e", "-f", "-%E", "-interaction=nonstopmode", "-synctex=1"]`
 			* (MiKTeX): `["texify", "-b", "-p", "--engine=%E", "--tex-option=\"--synctex=1\""]`
-		* `options` (unset): allows you to specify a TeX option, such as `--shell-escape`. This must be a tuple: that is, use `options: ["--shell-escape"]`
+		* `options` (`["-file-line-error", "-halt-on-error", "--max-print-line=10000"]`): TeX options passed to the builder. Shell escape is disabled by default; add `-shell-escape` explicitly to a trusted project or user setting if required.
 	The `basic` builder also supports the `program` and `options` options.
 	For the script builder, the following setting is **required**:
 		* `script_commands` (unset): a command or list of commands to run. Each command can be either a string or a list, e.g.:
@@ -147,15 +130,15 @@ This section refers to setting that can be found in a platform-specific block fo
 * `highlight_build_panel` (`true`): if `true` the build panel will have a syntax applied to highlight any errors and warnings. Otherwise, the standard output panel configuration will be used.
 * `build_panel_word_wrap` (`false`): if `true` enable word wrapping in build output panel.
 * `scroll_build_panel_to_top` (`false`): if `true` the build output panel is scrolled to top after build finished.
-* `show_panel_on_build` (`"badboxes"`): controls when build output panel is displayed. Possible values:
+* `show_panel_on_build` (`"always"`): controls when build output panel is displayed. Possible values:
 	* `"always"`: always show build panel.
 	* `"errors"`: show build panel if there are errors.
 	* `"warnings"`: show build panel if there are errors or warnings.
 	* `"badboxes"`: show build panel if there are errors, warnings, or badboxes; differs from `"warnings"` if `display_bad_boxes` is set to `true`.
 	* `"never"`: never show build panel, even if build failed.
 Any other value will be interpreted as the default.
-* `display_bad_boxes` (`false`): if `true` LaTeXTools will display any bad boxes encountered after a build. Note that this is disabled by default.
-* `show_error_phantoms` (`"warnings"`): **ST3 Build 3118 or newer only** controls which errors are displayed via phantoms. Possible values:
+* `display_bad_boxes` (`true`): if `true` LaTeXTools will display any bad boxes encountered after a build.
+* `show_error_phantoms` (`"badboxes"`): **ST3 Build 3118 or newer only** controls which errors are displayed via phantoms. Possible values:
 	 * `"none"`: never show any phantoms at all
 	 * `"errors"`: only show errors using phantoms
 	 * `"warnings"`: only show warnings or errors using phantoms
@@ -165,7 +148,7 @@ Any other value will be interpreted as the default.
 
 * `forward_sync` (`true`): if `true`, after compiling a tex file, the PDF viewer is asked to sync to the position corresponding to the current cursor location in ST. You can also *temporarily* toggle this behavior with `C-l,t,s`. This can also be overridden via a key-binding by passing a `forward_sync` argument to `latextools_jumpto_pdf`.
 
-* `keep_focus` (`true`): if `true`, after compiling a tex file, ST retains the focus; if `false`, the PDF viewer gets the focus. Also note that you can *temporarily* toggle this behavior with `C-l,t,f`.This can also be overridden via a key-binding by passing a `keep_focus` argument to `latextools_jumpto_pdf`.
+* `keep_focus` (`false`): if `true`, after compiling a tex file, ST retains the focus; if `false`, the PDF viewer gets the focus. Also note that you can *temporarily* toggle this behavior with `C-l,t,f`. This can also be overridden via a key-binding by passing a `keep_focus` argument to `latextools_jumpto_pdf`.
   
   **Note**: In general, `keep_focus` set to `true` tries to mean "do not *change* the focus". This isn't always possible, since several of the viewers will steal focus by default. In those circumstances, LaTeXTools tries to actively return the focus to Sublime. To disable this, set the `disable_focus_hack` setting to `true`.
   
@@ -175,7 +158,7 @@ Any other value will be interpreted as the default.
 
 * `viewer_settings`: these are viewer-specific settings. Please see the section on [Viewers](available-viewers.md) for details of what should be set here.
 
-* `open_pdf_on_build` (`"success"`): Controls whether to open configured PDF viewer after build. 
+* `open_pdf_on_build` (`"never"`): Controls whether to open configured PDF viewer after build.
   * `"never"`: PDF viewer is only launched if explicitly requested using `C-l,v` or `C-l,j`.
   * `"success"`: PDF is opened only, if build reports success.
   * `"always"`: PDF file is opened, even if build reported an error and PDF is most likely incomplete.
@@ -184,19 +167,19 @@ Any other value will be interpreted as the default.
 
 ## Included File Settings
 
- * `"image_types"` (`["png", "jpg", "jpeg", "pdf" "eps"]`): image types that you use in LaTeX. These are used for autocompletions and to open included images where no extension is provided. Broadly speaking, this should correspond to any `\DeclareGraphicsExtensions{}` commands used in your document, but the default value corresponds to the types of images supported by `pdflatex` (they are also supported by `xelatex` and `lualatex`).
+ * `"image_types"` (`["png", "pdf", "jpg", "jpeg", "eps", "gif", "bmp"]`): image types used for autocompletions and for opening included images without an extension. Match this list to the formats supported by your TeX installation.
 
 ## Bibliographic References Settings
 
 * `use_biblatex`: (`false`): if `true` LaTeXTools will use BibLaTeX defaults for editing `.bib` files. If `false`, LaTeXTools will use BibTeX defaults. See the section on [Support for Editing Bibliographies](features.md#support-for-editing-bibliographies) for details.
 
-* `bibliography` (`"new"`): specifies the bibliography plugin to use to handle extracting entries from a bibliography. May be specified either as a single plugin or a list of plugins to be executed in order. Possible values:
+* `bibliography` (`"traditional"`): specifies the bibliography plugin to use to handle extracting entries from a bibliography. May be specified either as a single plugin or a list of plugins to be executed in order. Possible values:
 	* `"traditional"`: the default bibliography which is quite fast and works for most situations.
 	* `"new"`: a newer bibliography engine which uses a full Bib(La)TeX parser that supports more complex formatting (multiline entries, values enclosed in double quotes `""`, literals and `@string` macros) and allows you to access more fields, but can be slower and may not be necessary for most bibliographies.
 
 * `cite_panel_format` (`["{author_short} {year} - {title_short} ({keyword})","{title}"]`): specifies the format for bibliography entries displayed in the quickpanel when typing `\cite{` or using one of the keybindings. It may either be a string or a list of two strings. In the latter case, the first string becomes the first line of the text displayed in the quick panel and the second the second.
 
-* `cite_autocomplete_format`(`"{keyword}: {title}"`): specifies the format for bibliography displayed when using Sublime's autocomplete functionality (`ctrl+space` or `alt+/`). Must be only a simple string.
+* `cite_autocomplete_format` (`["{keyword}: {title}", "", ""]`): three templates for the autocomplete trigger, annotation, and details shown by Sublime (`ctrl+space` or `alt+/`).
 
 ### Bibliography Format Strings
 

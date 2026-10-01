@@ -125,6 +125,35 @@ class WarningLogRule(ErrorLogRule):
     selector = "meta.warning.log - markup.warning"
 
 
+def _unlocated_fatal_error(view: sublime.View, blocks) -> str | None:
+    """Report a fatal TeX stop that the syntax rules could not assign to a file block."""
+    region = view.find(
+        r"(?m)^[ \t]*(?:! Emergency stop\.|==> Fatal error occurred,)[^\n]*", 0
+    )
+    if not region:
+        return None
+
+    stop_line = view.substr(region).strip()
+    message = stop_line[2:] if stop_line.startswith("! ") else stop_line
+    filename = blocks[-1][1] if blocks else "TeX log"
+    row, _ = view.rowcol(region.begin())
+    last_row, _ = view.rowcol(view.size())
+    recent = []
+    for nearby_row in range(max(0, row - 5), min(last_row + 1, row + 3)):
+        if nearby_row == row:
+            continue
+        line = view.substr(view.line(view.text_point(nearby_row, 0))).strip()
+        if not line or line == ")":
+            continue
+        if line.startswith("(") and line.endswith((".tex", ".sty", ".cls")):
+            continue
+        recent.append(line)
+
+    detail = " | ".join(recent[-4:])[: LogRule.MAX_MSG]
+    suffix = f" Recent log: {detail}" if detail else ""
+    return f"{filename}: TeX STOPPED: {message}{suffix}"
+
+
 def parse_log_view(view: sublime.View) -> tuple[list[str], list[str], list[str], int]:
     """
     Extract errors, warnings and badbox messages from a `sublime.View`.
@@ -183,8 +212,11 @@ def parse_log_view(view: sublime.View) -> tuple[list[str], list[str], list[str],
         pages = 0
 
     # gather log items
+    errors = format_items(chain(*map(extract_items, (ExceptionLogRule, ErrorLogRule))))
+    if not errors and (fatal_error := _unlocated_fatal_error(view, blocks)):
+        errors.append(fatal_error)
     return (
-        format_items(chain(*map(extract_items, (ExceptionLogRule, ErrorLogRule)))),
+        errors,
         format_items(extract_items(WarningLogRule)),
         format_items(extract_items(BadboxLogRule)),
         pages,

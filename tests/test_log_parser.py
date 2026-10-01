@@ -56,7 +56,23 @@ class ParseTexLogTestCase(DeferrableViewTestCase):
             ! Emergency stop.
             <*> \input customize.tex
             """,
-            expected_errors=[],
+            expected_errors=[
+                R"main.tex: TeX STOPPED: Emergency stop. Recent log: <*> \input customize.tex"
+            ],
+            expected_warnings=[],
+            expected_badboxes=[],
+        )
+
+    def test_emergency_stop_after_reported_error(self):
+        self.assert_tex_log_items(
+            R"""
+            (./main.tex
+            Package pkgname Error: An error message on input line 10.
+            )
+            ! Emergency stop.
+            <*> \input customize.tex
+            """,
+            expected_errors=["main.tex:10: An error message on input line 10"],
             expected_warnings=[],
             expected_badboxes=[],
         )
