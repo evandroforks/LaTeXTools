@@ -1072,7 +1072,8 @@ class LatextoolsFillAllCommand(
             # if there is only one completion and it already matches the
             # current text
             if force:
-                view.insert(edit, completions[0])
+                self.insert_at_end(view, edit, completions[0])
+                self.clear_bracket_cache()
                 return
             else:
                 if completions[0] == prefix:
