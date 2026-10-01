@@ -1,0 +1,616 @@
+%YAML 1.2
+---
+name: LaTeXTools Log
+scope: text.log.latex
+version: 2
+
+first_line_match: '^This is (?:Lua(?:HB)?|pdfe?|Xe)?TeXk?, Version '
+
+variables:
+  drive_char: '[a-zA-Z]'
+  file_name: '{{file_char}}*?{{file_ext}}{{file_break}}'
+  file_char: '[\s\w.-]'  # note: assume sane path names
+  file_ext: '\.{{file_ext_start}}{{file_ext_char}}*'
+  file_ext_start: '[a-zA-Z]'
+  file_ext_char: '[a-zA-Z0-9]'
+  file_break: (?:\n|(?=\s*[()]))
+
+  end_of_block: '[\s\)]*\)\s*[(\n]'
+
+################################################################################
+
+contexts:
+  main:
+    - include: log-entries
+    - include: blocks
+    - include: brackets
+    - include: comments
+    - include: commands
+    - include: constants
+    - include: strings
+
+  content:
+    - include: parens
+    - include: brackets
+    - include: comments
+    - include: commands
+    - include: constants
+    - include: strings
+
+###[ COMMENTS ]################################################################
+
+  comments:
+    # note: primarily used for syntax_test files
+    - match: ^\#
+      scope: punctuation.definition.comment.log
+      push: comment-body
+
+  comment-body:
+    - meta_scope: comment.line.log
+    - match: $\n?
+      pop: 1
+
+###[ BLOCKS ]##################################################################
+
+  blocks:
+    - match: (?=\()
+      branch_point: block
+      branch:
+        - block
+        - paren
+
+  block:
+    - match: \(
+      scope: punctuation.section.block.begin.log
+      set:
+        - block-body
+        - block-path-begin
+
+  block-path-begin:
+    # possible UNC path, starting at eol
+    - match: (\\)\n
+      captures:
+        1: punctuation.separator.path.log
+      set:
+        - block-unquoted-path
+        - block-unquoted-path-expect-backslash
+    # possible absolute posix path, starting at eol,
+    # maybe followed by windows drive letter
+    - match: (/)\n
+      captures:
+        1: punctuation.separator.path.log
+      set:
+        - block-unquoted-path
+        - block-unquoted-path-expect-begin
+    # possible windows drive letter at eol
+    - match: (/?){{drive_char}}\n
+      captures:
+        1: punctuation.separator.path.log
+      set:
+        - block-unquoted-path
+        - block-unquoted-path-expect-colon
+    # possible posix relative path, starting at eol
+    - match: \.\n
+      set:
+        - block-unquoted-path
+        - block-unquoted-path-expect-segment
+    # possible posix home path, starting at eol
+    - match: ~\n
+      set:
+        - block-unquoted-path
+        - block-unquoted-path-expect-slash
+    # possible path, starting at next line
+    - match: \n
+      set:
+        - block-path-begin-continuation
+        - bol-pop
+    - include: block-path-begin-continuation
+
+  block-path-begin-continuation:
+    # possible incomplete relative path or filename, starting at eol
+    - match: '[\s\w-]+\.?\n'
+      set:
+        - block-unquoted-path-meta
+        - block-unquoted-path-expect-file
+    # quoted path
+    - match: \"
+      scope: punctuation.definition.entity.begin.log
+      set: block-quoted-path
+    # UNC path
+    - match: \\\\
+      scope: punctuation.separator.path.log
+      set: block-unquoted-path
+    # drive letter
+    - match: '(/?){{drive_char}}(:[\\/]?)'
+      captures:
+        1: punctuation.separator.path.log
+        2: punctuation.separator.path.log
+      set: block-unquoted-path
+    # posix home or absolute path
+    - match: '~?(/)'
+      captures:
+        1: punctuation.separator.path.log
+      set: block-unquoted-path
+    # relative path
+    - match: '{{file_char}}+([\\/])'
+      captures:
+        1: punctuation.separator.path.log
+      set: block-unquoted-path
+    # filename.ext
+    - match: '{{file_name}}'
+      set: block-unquoted-ext
+    # not a path
+    - match: ''
+      fail: block
+
+  block-quoted-path:
+    - meta_scope: entity.name.section.filename.log
+    - match: \"
+      scope: punctuation.definition.entity.end.log
+      pop: 1
+    - match: '[:\\/]'
+      scope: punctuation.separator.path.log
+
+  block-unquoted-path-expect-backslash:
+    # UNC path
+    - match: ^\\(?![\\/])
+      scope: punctuation.separator.path.log
+      pop: 1
+    # otherwise it is not a block
+    - match: ^
+      fail: block
+
+  block-unquoted-path-expect-slash:
+    # single posix path separator
+    - match: ^/(?![\\/])
+      scope: punctuation.separator.path.log
+      pop: 1
+    # otherwise it is not a block
+    - match: ^
+      fail: block
+
+  block-unquoted-path-expect-begin:
+    # drive letter
+    - match: ^{{drive_char}}(:[\\/])
+      captures:
+        1: punctuation.separator.path.log
+      pop: 1
+    # expect file name or path
+    - include: block-unquoted-path-expect-segment
+
+  block-unquoted-path-expect-colon:
+    # colon after drive letter
+    - match: ^:[\\/]
+      scope: punctuation.separator.path.log
+      pop: 1
+    # expect file name or path
+    - include: block-unquoted-path-expect-segment
+
+  block-unquoted-path-expect-file:
+    # file name or extentions beginning with period
+    - match: ^{{file_name}}
+      pop: 2
+    # file extension without period
+    - match: ^{{file_ext_char}}+{{file_break}}
+      pop: 2
+    # otherwise it is not a block
+    - match: ^
+      fail: block
+
+  block-unquoted-path-expect-segment:
+    # path segment
+    - match: ^{{file_char}}*([\\/])
+      captures:
+        1: punctuation.separator.path.log
+      pop: 1
+    # consume very long file or folder name
+    - match: ^{{file_char}}{79}\n
+      pop: 1
+    # file name or exteions beginning with period
+    - match: ^{{file_name}}
+      pop: 1
+    # otherwise it is not a block
+    - match: ^
+      fail: block
+
+  block-unquoted-path-meta:
+    - meta_scope: entity.name.section.filename.log
+
+  block-unquoted-ext:
+    - meta_scope: entity.name.section.filename.log
+    # file name or exteions beginning with period
+    - match: ^{{file_name}}
+      pop: 1
+    # file extension without period
+    - match: ^{{file_ext_char}}+{{file_break}}
+      pop: 1
+    - match: (?=[ \t()])
+      pop: 1
+    - match: ^
+      pop: 1
+
+  block-unquoted-path:
+    - meta_scope: entity.name.section.filename.log
+    # begin of normal block body
+    - match: ^(?![{{file_char}}\\/]+{{file_break}})
+      pop: 1
+    - match: (?=\s*[\[\]\{\}\(\)])
+      pop: 1
+    - match: '[\\/]'
+      scope: punctuation.separator.path.log
+
+  block-body:
+    - meta_scope: meta.block.log
+    - match: \)
+      scope: punctuation.section.block.end.log
+      pop: 1
+    - include: main
+
+  brackets:
+    - match: \[
+      scope: punctuation.section.brackets.begin.log
+      push: bracket-body
+
+  bracket-body:
+    - meta_scope: meta.brackets.log
+    - match: \]
+      scope: punctuation.section.brackets.end.log
+      pop: 1
+    - include: content
+
+  parens:
+    - match: \(
+      scope: punctuation.section.parens.begin.log
+      push: paren-body
+
+  paren:
+    - match: \(
+      scope: punctuation.section.parens.begin.log
+      set: paren-body
+
+  paren-body:
+    - meta_scope: meta.parens.log
+    - match: \)
+      scope: punctuation.section.parens.end.log
+      pop: 1
+    - include: log-entries
+    - include: content
+
+###[ LOG ENTRIES ]##############################################################
+
+  log-entries:
+    # multi-line meta information, starting with exactly 79 chars
+    - match: ^(?:Dictionary:.{68}|Document Class:.{64}|File:.{74}|Language:.{70}|Package:.{71})\n
+      push: block-comment-body
+    # single-line meta information
+    - match: ^(?:Dictionary|Document Class|File|Language|Package):.+
+      scope: comment.line.log
+    # exceptions
+    - match: '^! [^:]*Error:'
+      scope: markup.error.log
+      push: log-exception-body
+    - match: '^! .*'
+      scope: markup.error.log
+      push: log-exception-body
+    # errors
+    - match: '^[^:]*Error:'
+      scope: markup.error.log
+      push: log-error-body
+    # warnings
+    - match: '^[^:]*(?:Overfull|Underfull)'
+      scope: markup.warning.log
+      embed: log-box-warning-body
+      escape: |-
+        (?x)
+        \[\]$
+        | ^(?= (?:
+          # next paragraph starting with
+          # `[1` or `[anytext]`
+            \s* \[ (?: \d+ | [^\]]+\] )$)
+          # end of block
+          | {{end_of_block}}
+          # exceptions
+          | ![ ]\w
+          # errors/info/warnings
+          | [^:]*(?:Error|Info|Note|Summary|Warning|warning \([^)]*\)):
+          # box warnings
+          | Overfull\b
+          | Underfull\b
+          )
+      escape_captures:
+        0: meta.warning.box.log punctuation.terminator.log
+    - match: '^[^:]*(?:Warning|warning \([^)]*\)):'
+      scope: markup.warning.log
+      push: log-warning-body
+    - match: '^[^:]*:\d*:.*'
+      scope: markup.warning.log
+      push: log-warning-body
+    # info
+    - match: '^[^:]*(?:Info|Note|Summary):'
+      scope: markup.info.log
+      push: log-info-body
+
+  block-comment-body:
+    - meta_scope: comment.line.log
+    - match: ^.{79}\n  # consume anything which has 79 chars
+    - match: \n
+      pop: 1
+
+  log-error-body:
+    - meta_scope: meta.error.log
+    - include: log-message-end
+    - include: log-paragraph-end
+    - include: log-item-continuations
+    - include: log-content
+
+  log-exception-body:
+    - meta_scope: meta.exception.log
+    # line starting with line number `l.<no>`
+    - match: ^l\.\d+\b
+      set: log-exception-hint-body
+    - include: log-item-continuations
+    - include: log-content
+
+  log-exception-hint-body:
+    - meta_content_scope: meta.exception.log
+    - include: log-paragraph-end
+    - include: log-item-continuations
+    - include: log-content
+
+  log-info-body:
+    - meta_scope: meta.info.log
+    - include: log-message-end
+    - include: log-paragraph-end
+    - include: log-item-continuations
+    - include: log-content
+
+  log-warning-body:
+    - meta_scope: meta.warning.log
+    - include: log-message-end
+    - include: log-paragraph-end
+    - include: log-item-continuations
+    - include: log-content
+
+  log-box-warning-body:
+    - meta_scope: meta.warning.box.log
+    - include: log-content
+
+  log-content:
+    - include: parens
+    - include: brackets
+    - include: comments
+    - include: log-cmds
+    - include: constants
+    - include: strings
+
+  log-message-end:
+    - match: \.$
+      pop: 1
+
+  log-paragraph-end:
+    # empty line
+    - match: ^$
+      pop: 1
+    # end of block
+    - match: ^(?={{end_of_block}})
+      pop: 1
+
+  log-item-continuations:
+    # Terminate log items before final line feed as `view.find_by_selector()`
+    # requires a gap between subsequent entries to separate them.
+    - match: $
+      branch_point: log-item-continuation
+      branch:
+        - log-item-continuation
+        - log-item-termination
+
+  log-item-continuation:
+    - meta_include_prototype: false
+    # rewind to previous linefeed and bail-out from log item body via 2nd branch
+    - match: |-
+        (?x)
+        ^(?=
+        # end of block
+          {{end_of_block}}
+        # exceptions
+        | ![ ]\w
+        # errors/info/warnings
+        | [^:]*(?:Error|Info|Note|Summary|Warning|warning \([^)]*\)):
+        # box warnings
+        | Overfull\b
+        | Underfull\b
+        )
+      fail: log-item-continuation
+    # continue log item body
+    - include: bol-pop
+
+  log-item-termination:
+    - meta_include_prototype: false
+    - match: ''
+      pop: 2
+
+  log-cmds:
+    - match: (\\)[\w@]+
+      scope: support.function.latex
+      captures:
+        1: punctuation.definition.variable.latex
+      push: log-cmd-args
+    - match: :?=
+      scope: keyword.operator.assignment.latex
+      push: value
+    - match: ;
+      scope: punctuation.separator.latex
+
+  log-cmd-args:
+    - meta_scope: meta.function-call.latex
+    - include: comments
+    - match: \s*(\{)
+      captures:
+        1: meta.braces.log punctuation.section.braces.begin.log
+      push: log-cmd-args-body
+    - match: \s*(\[)
+      captures:
+        1: meta.brackets.log punctuation.section.brackets.begin.log
+      push: log-bracket-body
+    - match: \s*(\()
+      captures:
+        1: meta.parens.log punctuation.section.parens.begin.log
+      push: log-paren-body
+    - match: ^|(?=\s*\S)
+      pop: 1
+    - include: log-item-continuations
+
+  log-cmd-args-body:
+    - meta_content_scope: meta.braces.log
+    - match: \}
+      scope: meta.braces.log punctuation.section.braces.end.log
+      pop: 1
+    - include: log-paragraph-end
+    - include: log-item-continuations
+    - include: log-content
+
+  log-bracket-body:
+    - meta_content_scope: meta.brackets.log
+    - match: \]
+      scope: meta.brackets.log punctuation.section.brackets.end.log
+      pop: 1
+    - include: log-paragraph-end
+    - include: log-item-continuations
+    - include: log-content
+
+  log-paren-body:
+    - meta_content_scope: meta.parens.log
+    - match: \)
+      scope: meta.parens.log punctuation.section.parens.end.log
+      pop: 1
+    - include: log-paragraph-end
+    - include: log-item-continuations
+    - include: log-entries
+    - include: log-content
+
+###[ COMMANDS ]#################################################################
+
+  commands:
+    - match: (\\)[\w@]+
+      scope: support.function.latex
+      captures:
+        1: punctuation.definition.variable.latex
+      push: cmd-args
+    - match: :?=
+      scope: keyword.operator.assignment.latex
+      push: value
+    - match: ;
+      scope: punctuation.separator.latex
+
+  cmd-args:
+    - meta_scope: meta.function-call.latex
+    - match: \{
+      scope: punctuation.section.braces.begin.log
+      push: cmd-args-body
+    - include: comments
+    - include: brackets
+    - include: parens
+    - include: immediately-pop
+
+  cmd-args-body:
+    - meta_scope: meta.braces.log
+    - match: \}
+      scope: punctuation.section.braces.end.log
+      pop: 1
+    - include: content
+
+  value:
+    - include: parens
+    - match: $|(?=\S)
+      pop: 1
+
+###[ STRINGS ]##################################################################
+
+  constants:
+    # copyright sign
+    - match: \(C\)
+    # consume plain window paths, to avoid segments being scoped latex commands
+    - match: \b{{drive_char}}:(?:\\\S*)?\n
+      push: path-continuation
+    - match: \b{{drive_char}}:\\\S*
+
+  path-continuation:
+    - match: ^\S*
+      pop: 1
+
+  strings:
+    - match: '{(?=\S)'
+      scope: punctuation.definition.string.begin.log
+      push: brace-quoted-string-body
+    - match: '<<'
+      scope: punctuation.definition.string.begin.log
+      push: double-angled-string-body
+    - match: '<(?=\S)'
+      scope: punctuation.definition.string.begin.log
+      push: single-angled-string-body
+    - match: '``'
+      scope: punctuation.definition.string.begin.log
+      push: double-quoted-string-body
+    - match: '`(?=\S)'
+      scope: punctuation.definition.string.begin.log
+      push: single-quoted-string-body
+    # escaped characters
+    - match: \\.
+
+  brace-quoted-string-body:
+    - meta_scope: string.quoted.other.log
+    - match: '}'
+      scope: punctuation.definition.string.end.log
+      pop: 1
+    - include: brace-quoted-nested-string-body
+
+  brace-quoted-nested-string-body:
+    - match: '}'
+      pop: 1
+    - match: '{'
+      push: brace-quoted-nested-string-body
+    - match: \\[{}]
+
+  double-angled-string-body:
+    - meta_scope: string.quoted.other.log
+    - match: '>>'
+      scope: punctuation.definition.string.end.log
+      pop: 1
+    - match: \\[<>]
+
+  single-angled-string-body:
+    - meta_scope: string.quoted.other.log
+    - match: '>'
+      scope: punctuation.definition.string.end.log
+      pop: 1
+    - match: \\[<>]
+
+  double-quoted-string-body:
+    - meta_scope: string.quoted.double.log
+    - match: ''''''
+      scope: punctuation.definition.string.end.log
+      pop: 1
+    - match: \.$
+      scope: punctuation.definition.string.end.log
+      pop: 1
+    - match: \\\'
+
+  single-quoted-string-body:
+    - meta_scope: string.quoted.single.log
+    - match: ''''
+      scope: punctuation.definition.string.end.log
+      pop: 1
+    - match: \.$
+      scope: punctuation.definition.string.end.log
+      pop: 1
+    - match: \\\'
+
+###[ PROTOTYPES ]###############################################################
+
+  bol-pop:
+    - match: ^
+      pop: 1
+
+  immediately-pop:
+    - match: ''
+      pop: 1

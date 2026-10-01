@@ -3,20 +3,19 @@
 LaTeXTools provides contexts to improve the creation for your keybindings.
 
 The general structure of a keybinding contains a context fields and LaTeXTools adds context you can use inside LaTeX. The key is prefixed with `latextools.` followed by a key, which is described in this section. It may be followed by additional specifiers, used by the context.
-For example in the context key `latextools.setting.setting_name` you have
+For example in the context key `latextools.setting.setting_name` you have 
 - the prefix `latextools` is used to have a unique name-space
 - the key `setting` is used to specify the context
 - the additional specifier `setting_name` my be used to provide additional arguments to the context
 
 
-```js
+```json
     {
         "keys": ["ctrl+l", "ctrl+x"],
         "command": "insert", "args": {"characters": "my_input"},
-        "context":
-        [
+        "context": [
             { "key": "selector", "operand": "text.tex.latex" },
-            { "key": "latextools.the_context", "operator": "equal", "operand": "The operand" },
+            { "key": "latextools.the_context", "operand": "The operand" },
         ],
     },
 ```

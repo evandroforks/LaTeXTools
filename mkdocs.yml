@@ -1,12 +1,13 @@
 site_name: LaTeXTools
-pages:
+repo_url: https://github.com/SublimeText/LaTeXTools
+nav:
   - "Home": "index.md"
   - "Installation": "install.md"
   - "Features": "features.md"
   - "Keybindings": "keybindings.md"
   - "Completions": "completions.md"
   - "Settings": "settings.md"
-  - "Available Builders": "available-builders.md"
+  - "Build System": "buildsystem.md"
   - "Available Viewers": "available-viewers.md"
   - "Provided Contexts": "context.md"
   - "Recommended Packages": "recommended-packages.md"
@@ -17,4 +18,7 @@ extra_javascript:
   - extra.js
 extra_css:
   - extra.css
-repo_url: https://github.com/SublimeText/LaTeXTools
+plugins:
+  - minify:
+      minify_html: true
+  - search

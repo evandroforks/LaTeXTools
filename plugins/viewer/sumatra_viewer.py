@@ -1,0 +1,108 @@
+import os
+import sys
+import traceback
+
+import sublime
+
+try:
+    import winreg
+except ImportError:
+    # not on Windows
+    pass
+
+from ...latextools.utils.external_command import external_command
+from ...latextools.utils.logging import logger
+from ...latextools.utils.settings import get_setting
+from .base_viewer import BaseViewer
+
+__all__ = ["SumatraViewer"]
+
+
+class SumatraViewer(BaseViewer):
+    @classmethod
+    def _find_sumatra_exe(cls):
+        if hasattr(SumatraViewer, "_sumatra_exe"):
+            return SumatraViewer._sumatra_exe
+
+        # Sumatra's installer writes the location of the exe to the
+        # App Paths registry key, which we can access using the winreg
+        # module.
+        try:
+            with winreg.OpenKey(
+                winreg.HKEY_LOCAL_MACHINE,
+                "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\App Paths\\SumatraPDF.exe",
+            ) as hndl:
+                SumatraViewer._sumatra_exe = winreg.QueryValue(hndl, "")
+                return SumatraViewer._sumatra_exe
+        except OSError:
+            pass
+
+        paths = [
+            os.path.expandvars("%PROGRAMFILES%\\SumatraPDF"),
+            os.path.expandvars("%ProgramW6432%\\SumatraPDF"),
+            os.path.expandvars("%PROGRAMFILES(x86)%\\SumatraPDF"),
+        ]
+
+        for path in paths:
+            if os.path.exists(path):
+                exe = os.path.join(path, "SumatraPDF.exe")
+                if os.path.exists(exe):
+                    SumatraViewer._sumatra_exe = exe
+                    return exe
+
+        return None
+
+    @classmethod
+    def _run_sumatra(cls, *args):
+        def _no_binary():
+            message = (
+                "Could not find SumatraPDF.exe. "
+                'Please ensure the "sumatra" setting in your '
+                "LaTeXTools settings is set and points to the location "
+                "of Sumatra on your computer."
+            )
+
+            def _error_msg():
+                sublime.error_message(message)
+
+            sublime.set_timeout(_error_msg, 1)
+            logger.error(message)
+
+        # favour 'sumatra' setting under viewer_settings if
+        # it exists, otherwise, use the platform setting
+        sumatra_binary = (
+            get_setting("viewer_settings", {}).get(
+                "sumatra", get_setting("windows", {}).get("sumatra", "SumatraPDF.exe")
+            )
+            or "SumatraPDF.exe"
+        )
+
+        try:
+            external_command([sumatra_binary, *args], use_texpath=False, show_window=True)
+        except Exception:
+            exc_info = sys.exc_info()
+
+            sumatra_exe = cls._find_sumatra_exe()
+            if sumatra_exe is not None and sumatra_exe != sumatra_binary:
+                try:
+                    external_command([sumatra_exe, *args], use_texpath=False, show_window=True)
+                except Exception:
+                    traceback.print_exc()
+                    _no_binary()
+                    return
+            else:
+                traceback.print_exception(*exc_info)
+                _no_binary()
+                return
+
+    @classmethod
+    def forward_sync(cls, pdf_file, tex_file, line, col, **kwargs):
+        cls._run_sumatra("-reuse-instance", "-forward-search", tex_file, str(line), pdf_file)
+
+    @classmethod
+    def view_file(cls, pdf_file, **kwargs):
+        cls._run_sumatra("-reuse-instance", pdf_file)
+
+    @classmethod
+    def supports_platform(cls, platform):
+        return platform == "windows"

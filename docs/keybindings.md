@@ -33,7 +33,7 @@ The default ST Build command takes care of the following:
 
 LaTeXTools offers a range of build variants to select standard build options. These variants can be used to customize the options passed to the LaTeXTools builder, so that you don't need a project file or to use any of the `%!TEX` directives to change, e.g., the build system used. Variants are provided for the supported builders and for the supported programs.
 
-In addition, custom Sublime build files can be created to add your own variants to standard LaTeXTools commands. For more on this, see the section on [Sublime Build Files](available-builders.md#sublime-build-files).
+In addition, custom Sublime build files can be created to add your own variants to standard LaTeXTools commands. For more on this, see the section on [Sublime Build Files](buildsystem.md#sublime-build-files).
 
 **Note**: The settings provided by build variants *override* settings specified using TeX directives or in your settings. This means, for example, if you select a build variant that changes the program, `%!TEX program` directives or `program` settings will be ignored. If you want to return LaTeXTools back to its default behavior, please select the **LaTeX** build variant.
 
@@ -63,13 +63,13 @@ This opens a quick panel displaying the current toggle values and their correspo
 
 **Keybinding:** <kbd>shift+escape</kbd>
 
-This will show the LaTeXTools build panel, including any messages from the previous build. This is useful if you have hidden the build panel, either using the `hide_build_panel` setting or by pressing <kbd>escape</kbd> when the panel is visible.
+This will show the LaTeXTools build panel, including any messages from the previous build. This is useful if build panel is not shown automatically due to `show_panel_on_build` setting or hidden by pressing <kbd>escape</kbd>.
 
 ## Removing temporary files from build
 
 **Keybinding:** <kbd>C+l</kbd>,<kbd>backspace</kbd>
 
-This deletes all temporary files from a previous build (the PDF file is kept). Subfolders are traversed recursively. This command also clears the [LaTeXTools cache](features.md#latextools-cache).
+This deletes all temporary files from a previous build (the PDF file is kept). Subfolders are traversed recursively. This command also clears the [LaTeXTools cache](features.md#caching).
 
 Two settings allow you to fine-tune the behavior of this command. `temp_files_exts` allows you to specify which file extensions should be considered temporary, and hence deleted. `temp_files_ignored_folders` allows you to specify folders that should not be traversed. A good example are `.git` folders, for people who use git for version control.
 
@@ -79,7 +79,7 @@ Two settings allow you to fine-tune the behavior of this command. `temp_files_ex
 
 **Keybinding:** <kbd>C+l</kbd>,<kbd>C+d</kbd>,<kbd>C+c</kbd>
 
-This clears the [LaTeXTools cache](features.md#latextools-cache). It is useful if the LaTeXTools cache information gets too out of date, but you want to maintain the LaTeX build files, such as `.aux`.
+This clears the [LaTeXTools cache](features.md#caching). It is useful if the LaTeXTools cache information gets too out of date, but you want to maintain the LaTeX build files, such as `.aux`.
 
 ## Forward Search and Inverse Search
 
@@ -95,6 +95,7 @@ Inverse search (i.e., going from the PDF file back to the TeX document in ST) de
  * Double-click in **Sumatra PDF** (Windows)
  * <kbd>Ctrl+left-click</kbd> in **Evince** (Linux)
  * <kbd>Shift+left-click</kbd> in **Okular** (Linux)
+ * <kbd>Ctrl+left-click</kbd> in **XReader** (Linux)
  * <kbd>Ctrl+left-click</kbd> in **Zathura** (Linux)
 
 
@@ -141,7 +142,7 @@ One often needs to enter **multiple citations**, as e.g. in `\cite{paper1,paper2
 
 LaTeXTools currently provides support for a range of referencing facilities, including those provided by the **cleveref**, **fancyref**, and **varioref** packages in addition to the standard, built-in reference commands. However, if you are using a reference command that LaTeXTools doesn't recognize, you can use the key combination <kbd>C+l</kbd>,<kbd>Alt+x</kbd>,<kbd>r</kbd> to display the quick-panel and insert a label anywhere.
 
-Similarly, LaTeXTools provides support for a range of bibliography referencing programs, including **biblatex** and **natbib** in addition to the default `\cite{}` command. Similarly to references, if you come across a command that requires a citation and LaTeXTools doesn't currently support it, you can use the key combination <kbd>C+l</kbd>,<kbd>Alt+x</kbd>,<kbd>c</kbd> to display the quick-panel of all ciations and insert the bibkey.
+Similarly, LaTeXTools provides support for a range of bibliography referencing programs, including **biblatex** and **natbib** in addition to the default `\cite{}` command. Similarly to references, if you come across a command that requires a citation and LaTeXTools doesn't currently support it, you can use the key combination <kbd>C+l</kbd>,<kbd>Alt+x</kbd>,<kbd>c</kbd> to display the quick-panel of all citations and insert the bibkey.
 
 The display of bibliographic entries is *customizable*. There is a setting, `cite-panel-format`, that controls exactly what to display in each of the two lines each entry gets in the citation quick panel. Options include author, title, short title, year, bibtex key, and journal. This is useful because people may prefer to use different strategies to refer to papers---author-year, short title-year, bibtex key (!), etc. Since only the first line in each quick panel entry is searchable, how you present the information matters. The default should be useful for most people; if you wish to change the format, check the `LaTeXTools.sublime-settings` file for detailed information. (As usual, copy that file to the `User` directory and edit your copy, not the original).
 
@@ -273,6 +274,6 @@ You can also *change the current environment* using the <kbd>C+l</kbd>,<kbd>C+Sh
 
 **Keybinding:** <kbd>C+l</kbd>,<kbd>w</kbd>
 
-This uses [TeXcount](http://ctan.org/pkg/texcount) to generate a word count for the current document which is displayed in a quick panel. If you don't have the `TeXcount`, you will simply get an error message. Word counts in LaTeX documents can be quite finicky, and its worth reviewing the TeXcount documentation to ensure your document is setup to generate as accurate a word-count as possible. The counts returned are those reported by: `texcount -total -merge <main_file.tex>`.
+This uses [TeXcount](https://ctan.org/pkg/texcount) to generate a word count for the current document which is displayed in a quick panel. If you don't have the `TeXcount`, you will simply get an error message. Word counts in LaTeX documents can be quite finicky, and its worth reviewing the TeXcount documentation to ensure your document is setup to generate as accurate a word-count as possible. The counts returned are those reported by: `texcount -total -merge <main_file.tex>`.
 
 The `word_count_sub_level` setting can be tweaked to display subcounts by chapter, section, etc. See the [Settings](settings.md).
