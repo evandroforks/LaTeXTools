@@ -40,17 +40,64 @@ This plugin provides several features that simplify working with LaTeX files:
 * Easily view package documentation
 * Word counts
 
-## Requirements and Setup
+## Installation
 
-The easiest way to install LaTeXTools is via [Package Control](https://packagecontrol.io/). See [the Package Control installation instructions](https://packagecontrol.io/installation) for details on how to set it up (it's very easy.) Once you have Package Control up and running, invoke it (via the **Command Palette** from the Tools menu, or from Preferences), select the **Install Package** command, and find **LaTeXTools**.
+### By Package Control
 
-If you prefer a more hands-on approach, you can always clone the git repository, or else just grab this plugin's .zip file from GitHub and extract it to your Packages directory (you can open it easily from ST, by clicking on **Preferences > Browse Packages**). Then, (re)launch ST. Please note that if you do a manual installation, the Package **must** be named **LaTeXTools**.
+1. Install [Sublime Text 4](https://www.sublimetext.com/) and
+   [Package Control](https://github.com/sublimehq/package_control#installation). In Sublime Text,
+   open **Tools > Command Palette**, run **Install Package Control**, and wait for it to finish.
+2. Open **Preferences > Package Control**, run **Add Channel**, and enter:
 
-Finally, you'll need to have a working TeX installation and a PDF viewer. LaTeXTools supports [MacTeX](https://www.tug.org/mactex/), [MiKTeX](https://www.miktex.org/) and [TeXLive](https://www.tug.org/texlive/) as TeX systems and [Skim](https://skim-app.sourceforge.net/), [Sumatra PDF](https://sumatrapdfreader.org/free-pdf-reader.html), [Evince](https://wiki.gnome.org/Apps/Evince), [Okular](https://okular.kde.org/), and [Zathura](https://pwmt.org/projects/zathura/) as PDF viewers. For detailed instructions on how to set these up, please see [our online documentation](https://latextools.readthedocs.io/en/latest/install/)!
+   ```text
+   https://raw.githubusercontent.com/evandrocoan/StudioChannel/master/channel.json
+   ```
 
-### ITE fork
+3. Open **Preferences > Package Settings > Package Control > Settings - User**. In the `channels`
+   setting, move the StudioChannel URL before the default Package Control channel. Keep all other
+   settings as they are. For example:
 
-To install the ITE fork through Package Control, add the [StudioChannel channel](https://raw.githubusercontent.com/evandrocoan/StudioChannel/master/channel.json) before the default Package Control channel in your `channels` setting, then install `LaTeXTools`. Channel order affects how Package Control resolves every package that appears in both channels, so review the channel contents before changing it.
+   ```json
+   {
+       "channels": [
+           "https://raw.githubusercontent.com/evandrocoan/StudioChannel/master/channel.json",
+           "https://packages.sublimetext.io/channel.json"
+       ]
+   }
+   ```
+
+   Keep any other channels already in your settings after StudioChannel, including the older
+   `https://packagecontrol.io/channel_v3.json` default URL if that is what your installation uses.
+
+   > [!WARNING]
+   > Putting StudioChannel first changes package selection for every name it shares with another
+   > channel. Review the [StudioChannel contents](https://raw.githubusercontent.com/evandrocoan/StudioChannel/master/channel.json)
+   > before changing the order.
+
+4. Open **Preferences > Package Control**, run **Install Package**, search for **LaTeXTools**, and
+   press **Enter**. Package Control installs the release published by StudioChannel, which can
+   differ from the current repository checkout.
+
+See also [ITE - Integrated Toolset Environment](https://github.com/evandrocoan/ITE) and the
+[Package Control usage guide](https://packagecontrol.io/docs/usage).
+
+### Manually
+
+If you prefer a more hands-on approach, you can clone the git repository or download its .zip file
+from GitHub and extract it to your Packages directory (open **Preferences > Browse Packages** in
+Sublime Text). Then restart Sublime Text. For a manual installation, the package directory **must**
+be named **LaTeXTools**.
+
+### TeX distribution and PDF viewer
+
+You'll need a working TeX installation and a PDF viewer. LaTeXTools supports
+[MacTeX](https://www.tug.org/mactex/), [MiKTeX](https://www.miktex.org/), and
+[TeXLive](https://www.tug.org/texlive/) as TeX systems, and
+[Skim](https://skim-app.sourceforge.net/),
+[Sumatra PDF](https://sumatrapdfreader.org/free-pdf-reader.html),
+[Evince](https://wiki.gnome.org/Apps/Evince), [Okular](https://okular.kde.org/), and
+[Zathura](https://pwmt.org/projects/zathura/) as PDF viewers. For setup details, see
+[our online documentation](https://latextools.readthedocs.io/en/latest/install/).
 
 ## Bugs, issues & feature requests
 
